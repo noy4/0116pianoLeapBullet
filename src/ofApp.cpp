@@ -9,6 +9,7 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     
     page = 0;
+    pageSpace = 1350;
     toSwipe = 0;
     
     string tekkin[] = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
@@ -16,16 +17,6 @@ void ofApp::setup(){
         "sounds/tekkinG.mp3", "sounds/tekkinG#.mp3", "sounds/tekkinA.mp3", "sounds/tekkinA#.mp3",
         "sounds/tekkinB.mp3", "sounds/tekkinC2.mp3"
     };
-    
-    for (int i = 0; i < 13; i++) {
-        ofSoundPlayer sound;
-        sound.load(tekkin[i]);
-        sound.setVolume(0.2);
-        sound.setMultiPlay(true);
-        
-        sounds.push_back(sound);
-        toSound.push_back(0);
-    }
     
 	leap.open(); //リープ使います宣言
     leap.setupGestures();
@@ -77,6 +68,13 @@ void ofApp::setup(){
     
     sphereShape = ofBtGetSphereCollisionShape(40);
     for (int i = 0; i < 13; i++) {
+        ofSoundPlayer sound;
+        sound.load(tekkin[i]);
+        sound.setVolume(0.2);
+        sound.setMultiPlay(true);
+        sounds.push_back(sound);
+        toSound.push_back(0);
+        
         shapes.push_back( new ofxBulletSphere() );
         ii = shapes.size()-1;
         ((ofxBulletSphere*)shapes[ii])->init(sphereShape);
@@ -99,7 +97,8 @@ void ofApp::setup(){
         sphereHits.push_back( false );
     }
     
-    for (int i = 0; i < 13; i++) {
+    sphereShape = ofBtGetSphereCollisionShape(30);
+    for (int i = 0; i < 96; i++) {
         soundSpheres.push_back( new ofxBulletSphere() );
         ii = soundSpheres.size()-1;
         ((ofxBulletSphere*)soundSpheres[ii])->init(sphereShape);
@@ -107,6 +106,17 @@ void ofApp::setup(){
         soundSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         soundSpheres[ii]->add();
 //        sphereHits.push_back( false );
+    }
+    
+    sphereShape = ofBtGetSphereCollisionShape(40);
+    for (int i = 0; i < 2; i++) {
+        buttonSpheres.push_back( new ofxBulletSphere() );
+        ii = buttonSpheres.size()-1;
+        ((ofxBulletSphere*)buttonSpheres[ii])->init(sphereShape);
+        ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(-400 + 100*i, 300, -200), 0.1);
+        buttonSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
+        buttonSpheres[ii]->add();
+        toButton.push_back( 0 );
     }
 }
 
@@ -116,7 +126,7 @@ void ofApp::update(){
     world.update();
 	fingersFound.clear();
     
-    double pageSpace = -(page-1) * 1200;
+    pagePosition = -(page-1) * pageSpace;
     
     for (int i = 0; i < toSound.size(); i++) {
         if (toSound[i] > 0) toSound[i] -= 1;
@@ -140,7 +150,7 @@ void ofApp::update(){
             break;
     }
     
-    ofPoint centerPos = ofPoint(0, -200, 200);
+    ofPoint centerPos = ofPoint(0, -150, 150);
     ofPoint sharpPos = ofPoint(0, 120, -100);
     int octCount = 0;
     ofVec3f diff;
@@ -149,6 +159,7 @@ void ofApp::update(){
     double r = 500;
     double angle;
     double angleSpace = 4.2;
+    double curve = 1.4;
     for(int i = 0; i < shapes.size(); i++){
         key = i % 12;
         switch (key) {
@@ -156,21 +167,21 @@ void ofApp::update(){
             case 3:
                 keyNum = key / 2.0;
                 angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y + sharpPos.y, centerPos.z -r/1.3*sin(angle)) - shapes[i]->getPosition();
+                diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y + sharpPos.y, centerPos.z -r/curve*sin(angle)) - shapes[i]->getPosition();
                 break;
             case 6:
             case 8:
             case 10:
                 keyNum = (key+1) / 2.0;
                 angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y + sharpPos.y, centerPos.z -r/1.3*sin(angle)) - shapes[i]->getPosition();
+                diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y + sharpPos.y, centerPos.z -r/curve*sin(angle)) - shapes[i]->getPosition();
                 break;
             case 0:
             case 2:
             case 4:
                 keyNum = key / 2.0;
                 angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y, centerPos.z -r/1.3*sin(angle)) - shapes[i]->getPosition();
+                diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle)) - shapes[i]->getPosition();
                 break;
             case 5:
             case 7:
@@ -178,7 +189,7 @@ void ofApp::update(){
             case 11:
                 keyNum = (key+1) / 2.0;
                 angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y, centerPos.z -r/1.3*sin(angle)) - shapes[i]->getPosition();
+                diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle)) - shapes[i]->getPosition();
                 if (i % 12 == 11) octCount++;
                 break;
                 
@@ -190,47 +201,26 @@ void ofApp::update(){
         shapes[i]->setDamping(1,.8);
     }
     
-    octCount = 0;
-    pageSpace = -(page) * 1200;
+    pagePosition = -(page) * pageSpace;
+    int sixteen = 0;
+    centerPos.y = 250;
+    angleSpace = 4.8;
+    
     for(int i = 0; i < soundSpheres.size(); i++){
-        key = i % 12;
-        switch (key) {
-            case 1:
-            case 3:
-                keyNum = key / 2.0;
-                angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y + sharpPos.y, centerPos.z -r/1.3*sin(angle)) - soundSpheres[i]->getPosition();
-                break;
-            case 6:
-            case 8:
-            case 10:
-                keyNum = (key+1) / 2.0;
-                angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y + sharpPos.y, centerPos.z -r/1.3*sin(angle)) - soundSpheres[i]->getPosition();
-                break;
-            case 0:
-            case 2:
-            case 4:
-                keyNum = key / 2.0;
-                angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y, centerPos.z -r/1.3*sin(angle)) - soundSpheres[i]->getPosition();
-                break;
-            case 5:
-            case 7:
-            case 9:
-            case 11:
-                keyNum = (key+1) / 2.0;
-                angle = (keyNum + (7*octCount))/angleSpace;
-                diff = ofVec3f(centerPos.x -r*cos(angle) + pageSpace, centerPos.y, centerPos.z -r/1.3*sin(angle)) - soundSpheres[i]->getPosition();
-                if (i % 12 == 11) octCount++;
-                break;
-                
-            default:
-                break;
-        }
+        angle = (i % 16) / angleSpace;
+        diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y - (sixteen*100), centerPos.z -r/1.3*sin(angle)) - soundSpheres[i]->getPosition();
+        if (i % 16 == 15) sixteen += 1;
+        
         diff *= 40;
         soundSpheres[i]->applyCentralForce(diff);
         soundSpheres[i]->setDamping(1,.8);
+    }
+    
+    for (int i = 0; i < buttonSpheres.size(); i++) {
+        diff = ofVec3f(100*i - 50, -200, 200) - buttonSpheres[i]->getPosition();
+        diff *= 40;
+        buttonSpheres[i]->applyCentralForce(diff);
+        buttonSpheres[i]->setDamping(1,.8);
     }
     
     simpleHands = leap.getSimpleHands(); //手の数取得
@@ -333,8 +323,8 @@ void ofApp::draw(){
     ofSetColor(0,0,0);
     sphere->draw();
     
-    ofSetColor(255,100,100);
     for(int i = 0; i < shapes.size(); i++) {
+        ofSetColor(255,100,toSound[i]*10 + 155);
         shapes[i]->draw();
     }
     
@@ -348,11 +338,9 @@ void ofApp::draw(){
 //        handSpheres[i]->draw();
 //    }
     
-//    ofPushMatrix();//グリッドの描画
-//    ofRotate(90, 0, 0, 1);
-//    ofSetColor(20);
-//    ofDrawGridPlane(800, 20, false);
-//    ofPopMatrix();
+    for(int i = 0; i < buttonSpheres.size(); i++) {
+        buttonSpheres[i]->draw();
+    }
     
     int ii = 0;
     fingerType fingerTypes[] = {THUMB, INDEX, MIDDLE, RING, PINKY};
@@ -401,8 +389,14 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
 //    }
     
     for (int i = 0; i < shapes.size(); i++) {
-        if(*shapes[i] == cdata) {
+        if(*shapes[i] == cdata && toSound[i] == 0) {
             sphereHits[i] = true;
+            //        for (int j = 0; j < sphereHits.size(); j++) {
+            //            if (sphereHits[j] == true && toSound[j] == 0) {
+                            sounds[i].play();
+                            toSound[i] = 10;
+            //            }
+            //        }
         }
     }
     

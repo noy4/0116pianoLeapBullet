@@ -31,10 +31,12 @@ public:
 	vector <ofxLeapMotionSimpleHand> simpleHands;
 	vector <int> fingersFound;
     
-    ofSoundPlayer mySound;
-    vector <ofSoundPlayer> sounds;
-    vector <int> toSound;
-    int toPlayTime;
+    ofSoundPlayer           mySound;
+    vector <ofSoundPlayer>  sounds;
+    vector <int>            toSound;
+    int                     toPlayTime;
+    vector <int>            toBeat;
+    vector <int>            toButton;
     
     ofxBulletWorldRigid             world;
     ofxBulletBox                    ground;
@@ -51,10 +53,15 @@ public:
     vector<ofxBulletRigidBody*>     shapes;
     vector<ofxBulletRigidBody*>     handSpheres;
     vector<ofxBulletRigidBody*>     soundSpheres;
+    vector<ofxBulletRigidBody*>     buttonSpheres;
     
-    vector<bool>                handHits;
-    vector<bool>                sphereHits;
+    vector<bool>        handHits;
+    vector<bool>        sphereHits;
+    vector<bool>        bOn;
+    bool                bPlay;
     
-    int page;
-    int toSwipe;
+    int         page;
+    double      pageSpace;
+    double      pagePosition;
+    int         toSwipe;
 };
