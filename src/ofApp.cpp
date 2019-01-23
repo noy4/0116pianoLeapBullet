@@ -8,9 +8,10 @@ void ofApp::setup(){
     ofSetFrameRate(60); //画面設定
     ofSetVerticalSync(true);
     
-    page = 0;
+    page = 1;
     pageSpace = 1350;
     toSwipe = 0;
+    bPlay = false;
     
     string tekkin[] = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
         "sounds/tekkinD#.mp3", "sounds/tekkinE.mp3", "sounds/tekkinF.mp3", "sounds/tekkinF#.mp3",
@@ -43,24 +44,36 @@ void ofApp::setup(){
     sphere->create(world.world, ofVec3f(0, 100, -100), 0.1, 5);
     sphere->add();
     
-    ground.create( world.world, ofVec3f(0., -400, 0.), 0., 1000.f, 1.f, 1000.f );
+    ground.create( world.world, ofVec3f(0., -600, 0.), 0., 2000.f, 1.f, 2000.f );
     ground.setProperties(.25, .95);
     ground.add();
     
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
     
-    light.setPosition(0, 1000, 0);
+    light.setPosition(0, 1000, 500);
     
     int ii = 0;
-    handSphere = ofBtGetSphereCollisionShape(20);
     
+    pagePosition = -(page-1) * pageSpace;
+    ofPoint centerPos = ofPoint(0, -150, 150);
+    ofPoint sharpPos = ofPoint(0, 120, -100);
+    int octCount = 0;
+    ofVec3f diff;
+    int key;
+    float keyNum;
+    double r = 500;
+    double angle;
+    double angleSpace = 4.2;
+    double curve = 1.4;
+    
+    handSphere = ofBtGetSphereCollisionShape(20);
     for (int i = 0; i < 40; i++) {
         handSpheres.push_back( new ofxBulletSphere() );
         ii = handSpheres.size()-1;
         ((ofxBulletSphere*)handSpheres[ii])->init(handSphere);
         // no need to pass radius, since we already created it in the sphereShape //
-        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(0,-100,0), 0.1);
+        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), -600, ofRandom(-500, -400)), 0.1);
         handSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         handSpheres[ii]->add();
         handHits.push_back( false );
@@ -73,47 +86,82 @@ void ofApp::setup(){
         sound.setVolume(0.2);
         sound.setMultiPlay(true);
         sounds.push_back(sound);
-        toSound.push_back(0);
+        toPiano.push_back(0);
         
         shapes.push_back( new ofxBulletSphere() );
         ii = shapes.size()-1;
         ((ofxBulletSphere*)shapes[ii])->init(sphereShape);
-        // no need to pass radius, since we already created it in the sphereShape //
-//        switch (i % 12) {
-//            case 1:
-//                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(-400 + 100*i, 0, -200), 0.1);
-//                break;
-//            case 3:
-//                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(-400 + 100*i, 0, -200), 0.1);
-//                break;
-//
-//            default:
-//                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(-400 + 100*i, 0, 0), 0.1);
-//                break;
-//        }
-        ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(-400 + 100*i, 0, -200), 0.1);
+        
+        key = i % 12;
+        switch (key) {
+            case 1:
+            case 3:
+                keyNum = key / 2.0;
+                angle = (keyNum + (7*octCount))/angleSpace;
+                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y + sharpPos.y, centerPos.z -r/curve*sin(angle)), 0.1);
+                break;
+            case 6:
+            case 8:
+            case 10:
+                keyNum = (key+1) / 2.0;
+                angle = (keyNum + (7*octCount))/angleSpace;
+                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y + sharpPos.y, centerPos.z -r/curve*sin(angle)), 0.1);
+                break;
+            case 0:
+            case 2:
+            case 4:
+                keyNum = key / 2.0;
+                angle = (keyNum + (7*octCount))/angleSpace;
+                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle)), 0.1);
+                break;
+            case 5:
+            case 7:
+            case 9:
+            case 11:
+                keyNum = (key+1) / 2.0;
+                angle = (keyNum + (7*octCount))/angleSpace;
+                ((ofxBulletSphere*)shapes[ii])->create(world.world, ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle)), 0.1);
+                if (i % 12 == 11) octCount++;
+                break;
+                
+            default:
+                break;
+        }
+        
+        shapes[i]->setDamping(1,.8);
         shapes[ii]->setActivationState( DISABLE_DEACTIVATION );
         shapes[ii]->add();
         sphereHits.push_back( false );
     }
     
+    pagePosition = -(page) * pageSpace;
+    int sixteen = 0;
+    centerPos.y = 250;
+    angleSpace = 4.8;
     sphereShape = ofBtGetSphereCollisionShape(30);
     for (int i = 0; i < 96; i++) {
         soundSpheres.push_back( new ofxBulletSphere() );
         ii = soundSpheres.size()-1;
         ((ofxBulletSphere*)soundSpheres[ii])->init(sphereShape);
-        ((ofxBulletSphere*)soundSpheres[ii])->create(world.world, ofVec3f(-400 + 100*i, 300, -200), 0.1);
+        
+        angle = (i % 16) / angleSpace;
+        ((ofxBulletSphere*)soundSpheres[ii])->create(world.world, ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y - (sixteen*100), centerPos.z -r/1.3*sin(angle)), 0.1);
+        if (i % 16 == 15) sixteen += 1;
+        
+        soundSpheres[i]->setDamping(1,.8);
         soundSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         soundSpheres[ii]->add();
-//        sphereHits.push_back( false );
+        toBeat.push_back( 0 );
+        bOn.push_back(false);
     }
     
     sphereShape = ofBtGetSphereCollisionShape(40);
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         buttonSpheres.push_back( new ofxBulletSphere() );
         ii = buttonSpheres.size()-1;
         ((ofxBulletSphere*)buttonSpheres[ii])->init(sphereShape);
-        ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(-400 + 100*i, 300, -200), 0.1);
+        ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 1) + pagePosition, -400, 0), 0.1);
+        buttonSpheres[ii]->setDamping(1, .8);
         buttonSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         buttonSpheres[ii]->add();
         toButton.push_back( 0 );
@@ -126,10 +174,14 @@ void ofApp::update(){
     world.update();
 	fingersFound.clear();
     
-    pagePosition = -(page-1) * pageSpace;
-    
-    for (int i = 0; i < toSound.size(); i++) {
-        if (toSound[i] > 0) toSound[i] -= 1;
+    for (int i = 0; i < toPiano.size(); i++) {
+        if (toPiano[i] > 0) toPiano[i] -= 1;
+    }
+    for (int i = 0; i < toButton.size(); i++) {
+        if (toButton[i] > 0) toButton[i] -= 1;
+    }
+    for (int i = 0; i < toBeat.size(); i++) {
+        if (toBeat[i] > 0) toBeat[i] -= 1;
     }
     
     if (toSwipe > 0) toSwipe -= 1;
@@ -150,6 +202,7 @@ void ofApp::update(){
             break;
     }
     
+    pagePosition = -(page-1) * pageSpace;
     ofPoint centerPos = ofPoint(0, -150, 150);
     ofPoint sharpPos = ofPoint(0, 120, -100);
     int octCount = 0;
@@ -198,7 +251,6 @@ void ofApp::update(){
         }
         diff *= 40;
         shapes[i]->applyCentralForce(diff);
-        shapes[i]->setDamping(1,.8);
     }
     
     pagePosition = -(page) * pageSpace;
@@ -213,14 +265,12 @@ void ofApp::update(){
         
         diff *= 40;
         soundSpheres[i]->applyCentralForce(diff);
-        soundSpheres[i]->setDamping(1,.8);
     }
     
     for (int i = 0; i < buttonSpheres.size(); i++) {
-        diff = ofVec3f(100*i - 50, -200, 200) - buttonSpheres[i]->getPosition();
+        diff = ofVec3f(200.0*(i - 1) + pagePosition, -400, 0) - buttonSpheres[i]->getPosition();
         diff *= 40;
         buttonSpheres[i]->applyCentralForce(diff);
-        buttonSpheres[i]->setDamping(1,.8);
     }
     
     simpleHands = leap.getSimpleHands(); //手の数取得
@@ -268,9 +318,9 @@ void ofApp::update(){
     
 //    for (int i = 0; i < handHits.size(); i++){
 //        for (int j = 0; j < sphereHits.size(); j++) {
-//            if (sphereHits[j] == true && toSound[j] == 0) {
+//            if (sphereHits[j] == true && toPiano[j] == 0) {
 //                sounds[j].play();
-//                toSound[j] = 10;
+//                toPiano[j] = 10;
 //            }
 //        }
 //    }
@@ -309,36 +359,77 @@ void ofApp::draw(){
     
     ofSetLineWidth(1.f);
     ofSetColor(255, 0, 200);
-    world.drawDebug(); //輪郭というか辺と軸線
+//    world.drawDebug(); //輪郭というか辺と軸線
     
     ofEnableLighting();
     light.enable();
     
     ofSetColor(0, 100, 100, 50);
-    if(leap.iGestures == 3){
-//        cam.setOrientation(ofVec3f(0,90,0));
-    }
     ground.draw();
     
     ofSetColor(0,0,0);
     sphere->draw();
     
     for(int i = 0; i < shapes.size(); i++) {
-        ofSetColor(255,100,toSound[i]*10 + 155);
+        ofSetColor(255,100,toPiano[i]*10 + 155);
         shapes[i]->draw();
     }
     
     ofSetColor(100,255,100);
+    int sixteen = 0;
+    int bar = 0;
     for(int i = 0; i < soundSpheres.size(); i++) {
-        soundSpheres[i]->draw();
+        
+        if (!bOn[i]) {
+            switch (bar % 2) {
+                case 0:
+                    ofSetColor(255);
+                    soundSpheres[i]->draw();
+                    break;
+                case 1:
+                    ofSetColor(200);
+                    soundSpheres[i]->draw();
+                    break;
+                    
+                default:
+                    break;
+            }
+        } else {
+            ofSetColor(255, 150, 0);
+            soundSpheres[i]->draw();
+        }
+    
+        if (i % 4 == 3) bar += 1;
+        if (i % 16 == 15){
+            sixteen += 1;
+            bar = 0;
+        }
     }
     
-//    ofSetColor(0,200,200);
-//    for(int i = 0; i < handSpheres.size(); i++) {
-//        handSpheres[i]->draw();
-//    }
+    ofSetColor(0,200,200);
+    for(int i = 0; i < handSpheres.size(); i++) {
+        handSpheres[i]->draw();
+    }
     
     for(int i = 0; i < buttonSpheres.size(); i++) {
+        switch (i) {
+            case 0:
+                ofSetColor(0, 255, toButton[i]*8);
+                break;
+            case 1:
+                if (bPlay) {
+                    ofSetColor(255, 50, 50);
+                } else {
+                    ofSetColor(50, 50, 255);
+                }
+                break;
+            case 2:
+                ofSetColor(200, toButton[i]*8, toButton[i]*8);
+                break;
+                
+            default:
+                break;
+        }
         buttonSpheres[i]->draw();
     }
     
@@ -389,12 +480,12 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
 //    }
     
     for (int i = 0; i < shapes.size(); i++) {
-        if(*shapes[i] == cdata && toSound[i] == 0) {
+        if(*shapes[i] == cdata && toPiano[i] == 0) {
             sphereHits[i] = true;
             //        for (int j = 0; j < sphereHits.size(); j++) {
             //            if (sphereHits[j] == true && toSound[j] == 0) {
                             sounds[i].play();
-                            toSound[i] = 10;
+                            toPiano[i] = 10;
             //            }
             //        }
         }
@@ -403,6 +494,36 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
     for (int i = 0; i < handSpheres.size(); i++) {
         if(*handSpheres[i] == cdata) {
             handHits[i] = true;
+        }
+    }
+    
+    for (int i = 0; i < buttonSpheres.size(); i++) {
+        if(*buttonSpheres[i] == cdata && toButton[i] == 0) {
+            switch (i) {
+                case 0:
+                    
+                    break;
+                case 1:
+                    bPlay = !bPlay;
+                    break;
+                case 2:
+                    for (int j = 0; j < soundSpheres.size(); j++) {
+                        bOn[j] = false;
+                    }
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            toButton[i] = 30;
+        }
+    }
+    
+    for (int i = 0; i < soundSpheres.size(); i++) {
+        if(*soundSpheres[i] == cdata && toBeat[i] == 0) {
+            bOn[i] = !bOn[i];
+            toBeat[i] = 30;
         }
     }
 }

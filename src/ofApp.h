@@ -33,7 +33,7 @@ public:
     
     ofSoundPlayer           mySound;
     vector <ofSoundPlayer>  sounds;
-    vector <int>            toSound;
+    vector <int>            toPiano;
     int                     toPlayTime;
     vector <int>            toBeat;
     vector <int>            toButton;
