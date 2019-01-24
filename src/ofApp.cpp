@@ -12,6 +12,8 @@ void ofApp::setup(){
     pageSpace = 1350;
     toSwipe = 0;
     bPlay = false;
+    toPlayTime = 0;
+    column = 0;
     
     string tekkin[] = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
         "sounds/tekkinD#.mp3", "sounds/tekkinE.mp3", "sounds/tekkinF.mp3", "sounds/tekkinF#.mp3",
@@ -44,6 +46,11 @@ void ofApp::setup(){
     sphere->create(world.world, ofVec3f(0, 100, -100), 0.1, 5);
     sphere->add();
     
+//    cylinder = new ofxBulletCylinder();
+//    cylinder->create(world.world, ofVec3f(0, 100, 100), 0.1, 5, 200);
+//    cylinder->setDamping(1, 1);
+//    cylinder->add();
+    
     ground.create( world.world, ofVec3f(0., -600, 0.), 0., 2000.f, 1.f, 2000.f );
     ground.setProperties(.25, .95);
     ground.add();
@@ -73,7 +80,7 @@ void ofApp::setup(){
         ii = handSpheres.size()-1;
         ((ofxBulletSphere*)handSpheres[ii])->init(handSphere);
         // no need to pass radius, since we already created it in the sphereShape //
-        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), -600, ofRandom(-500, -400)), 0.1);
+        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), ofRandom(-580, -550), ofRandom(-400, -300)), 0.1);
         handSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         handSpheres[ii]->add();
         handHits.push_back( false );
@@ -197,6 +204,10 @@ void ofApp::update(){
                 page -= 1;
                 toSwipe = 20;
             }
+            break;
+//        case 10:
+//            OF_EXIT_APP(0);
+//            break;
             
         default:
             break;
@@ -333,6 +344,27 @@ void ofApp::update(){
 //        toPlayTime = 0;
 //    }
     
+    if (bPlay) {
+        if(toPlayTime == 0){
+//            sounds[0].play();
+            for (int i = 0; i < 6; i++) {
+                if (bOn[column + (16*i)]) {
+                    sounds[i].play();
+                }
+            }
+            
+        }
+        toPlayTime += 1;
+        if (toPlayTime == 10) {
+            toPlayTime = 0;
+            column += 1;
+        }
+        if (column == 16) {
+            column = 0;
+        }
+    }
+    
+    
     for (int i = 0; i < handSpheres.size(); i++) {
         handHits[i] = false;
     }
@@ -346,6 +378,10 @@ void ofApp::update(){
 	leap.markFrameAsOld();
     ofSoundUpdate();
 }
+
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -365,9 +401,12 @@ void ofApp::draw(){
     light.enable();
     
     ofSetColor(0, 100, 100, 50);
+//    if (leap.iGestures == 10) {
+//        ofSetColor(255, 100, 100);
+//    }
     ground.draw();
     
-    ofSetColor(0,0,0);
+    ofSetColor(0,255,0);
     sphere->draw();
     
     for(int i = 0; i < shapes.size(); i++) {
@@ -460,11 +499,26 @@ void ofApp::draw(){
             
             ofSetColor(255, 0, 0);
             ofSetLineWidth(20);
-            ofLine(mcp.x, mcp.y, mcp.z, pip.x, pip.y, pip.z);
-            ofLine(pip.x, pip.y, pip.z, dip.x, dip.y, dip.z);
-            ofLine(dip.x, dip.y, dip.z, tip.x, tip.y, tip.z);
+            ofDrawLine(mcp.x, mcp.y, mcp.z, pip.x, pip.y, pip.z);
+            ofDrawLine(pip.x, pip.y, pip.z, dip.x, dip.y, dip.z);
+            ofDrawLine(dip.x, dip.y, dip.z, tip.x, tip.y, tip.z);
         }
     }
+    
+    
+    pagePosition = -(page) * pageSpace;
+    ofPoint centerPos = ofPoint(0, 300, 150);
+    double r = 500;
+    double curve = 1.3;
+    double angle = (double(column) + (toPlayTime/10.0))/ 4.8;
+    
+//    cylinder->draw();
+//    ofVec3f diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y - 200, centerPos.z -r/curve*sin(angle)) - cylinder->getPosition();
+//    diff *= 40;
+//    cylinder->applyCentralForce(diff);
+    ofSetColor(0);
+    ofSetLineWidth(20);
+    ofDrawLine(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle), centerPos.x -r*cos(angle) + pagePosition, centerPos.y -600, centerPos.z -r/curve*sin(angle));
     
     light.disable();
     ofDisableLighting();
@@ -501,7 +555,8 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
         if(*buttonSpheres[i] == cdata && toButton[i] == 0) {
             switch (i) {
                 case 0:
-                    
+                    toPlayTime = 0;
+                    column = 0;
                     break;
                 case 1:
                     bPlay = !bPlay;

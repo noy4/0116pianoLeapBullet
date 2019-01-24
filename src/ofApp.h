@@ -35,6 +35,7 @@ public:
     vector <ofSoundPlayer>  sounds;
     vector <int>            toPiano;
     int                     toPlayTime;
+    int                     column;
     vector <int>            toBeat;
     vector <int>            toButton;
     
