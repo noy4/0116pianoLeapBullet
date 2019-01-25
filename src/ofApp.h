@@ -27,9 +27,9 @@ public:
     ofEasyCam                       cam;
     ofLight                         light;
     
-	ofxLeapMotion leap;
-	vector <ofxLeapMotionSimpleHand> simpleHands;
-	vector <int> fingersFound;
+	ofxLeapMotion                       leap;
+	vector <ofxLeapMotionSimpleHand>    simpleHands;
+	vector <int>                        fingersFound;
     
     ofSoundPlayer           mySound;
     vector <ofSoundPlayer>  sounds;
@@ -38,29 +38,26 @@ public:
     vector <string>         animalSoshina;
     vector <string>         charactor;
     vector <string>         drum;
-    vector <string> drumSet;
-    vector <string> soshina;
-    vector <string> pianoSet;
-    vector <string> animalSet;
-    vector <string> charaSet;
-    vector <string> omoroSet;
+    vector <string>         drumSet;
+    vector <string>         soshinaSet;
+    vector <string>         pianoSet;
+    vector <string>         animalSet;
+    vector <string>         charaSet;
+    vector <string>         omoroSet;
     vector <int>            toPiano;
     int                     toPlayTime;
     int                     column;
     vector <int>            toBeat;
     vector <int>            toButton;
-    int     keySet;
-    int     keySet2;
-    int     melodySet;
+    int                     keySet;
+    int                     keySet2;
+    int                     melodySet;
+    vector <bool>           melody1;
+    vector <bool>           melody2;
+    vector <bool>           melody3;
     
     ofxBulletWorldRigid             world;
     ofxBulletBox                    ground;
-    
-    ofxBulletSphere*                sphere;
-    ofxBulletBox*                   box;
-    ofxBulletCone*                  cone;
-    ofxBulletCapsule*               capsule;
-    ofxBulletCylinder*              cylinder;
     
     btBoxShape*                     boxShape;
     btSphereShape*                  sphereShape;
@@ -69,13 +66,20 @@ public:
     vector<ofxBulletRigidBody*>     soundSpheres;
     vector<ofxBulletRigidBody*>     buttonSpheres;
     
-    vector<bool>        handHits;
     vector<bool>        sphereHits;
     vector<bool>        bOn;
     bool                bPlay;
+    int                 tempo;
     
     int         page;
     double      pageSpace;
     double      pagePosition;
     int         toSwipe;
+    
+    bool menu;
+    double menuSpace;
+    bool tutorial;
+    
+    ofTrueTypeFont font1;
+    ofTrueTypeFont font2;
 };

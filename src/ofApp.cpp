@@ -8,24 +8,41 @@ void ofApp::setup(){
     ofSetFrameRate(60); //画面設定
     ofSetVerticalSync(true);
     
-    page = 1;
-    pageSpace = 1350;
-    toSwipe = 0;
-    bPlay = false;
-    toPlayTime = 0;
-    column = 0;
-    keySet = 0;
-    keySet2 = 0;
-    melodySet = 0;
+    page =          1;
+    pageSpace =     1350;
+    toSwipe =       0;
+    bPlay =         false;
+    toPlayTime =    0;
+    tempo =         10;
+    column =        0;
+    keySet =        0;
+    keySet2 =       0;
+    melodySet =     -1;
+    menu =          false;
+    menuSpace =     0;
+    tutorial =      false;
+    
+    ofTrueTypeFontSettings settings("goPr.otf", 11);
+    settings.addRanges(ofAlphabet::Emoji);//絵文字
+    settings.addRanges(ofAlphabet::Japanese);//日本語
+    settings.addRange(ofUnicode::Latin);//アルファベット等
+    font1.load(settings);
+    
+    ofTrueTypeFontSettings settings2("goPr.otf", 30);
+    settings.addRanges(ofAlphabet::Emoji);//絵文字
+    settings2.addRanges(ofAlphabet::Japanese);
+    settings.addRange(ofUnicode::Latin);//アルファベット等
+    font2.load(settings2);
+    font2.setLineHeight(30);
     
     tekkinPiano = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
         "sounds/tekkinD#.mp3", "sounds/tekkinE.mp3", "sounds/tekkinF.mp3", "sounds/tekkinF#.mp3",
         "sounds/tekkinG.mp3", "sounds/tekkinG#.mp3", "sounds/tekkinA.mp3", "sounds/tekkinA#.mp3",
-        "sounds/tekkinB.mp3", "sounds/Piano_C.mp3",    "sounds/Piano_C#.mp3",    "sounds/Piano_D.mp3",    "sounds/Piano_D#.mp3",    "sounds/Piano_E.mp3",    "sounds/Piano_F.mp3",    "sounds/Piano_F#.mp3",    "sounds/Piano_G.mp3",    "sounds/Piano_G#.mp3",    "sounds/Piano_A.mp3",    "sounds/Piano_A#.mp3",    "sounds/Piano_B.mp3",
+        "sounds/tekkinB.mp3", "sounds/Piano_C.mp3",    "sounds/Piano_C#.mp3",    "sounds/Piano_D.mp3",    "sounds/Piano_D#.mp3",    "sounds/Piano_E.mp3",    "sounds/Piano_F.mp3",    "sounds/Piano_F#.mp3",    "sounds/Piano_G.mp3",    "sounds/Piano_G#.mp3",    "sounds/Piano_A.mp3",    "sounds/Piano_A#.mp3",    "sounds/Piano_B.mp3"
     };
     
     animalSoshina = {
-        "sounds/ashika.mp3", "sounds/hitsuji.mp3", "sounds/inoshishi.mp3", "sounds/inu.mp3", "sounds/kakkou.mp3", "sounds/karasu.mp3", "sounds/lion.mp3", "sounds/neko.mp3", "sounds/niwatori.mp3", "sounds/uribou.mp3", "sounds/yagi.mp3", "sounds/zou.mp3", "sounds/103.mp3",    "sounds/boragino-ru.mp3",    "sounds/gekidanshiki.mp3",    "sounds/hizuke.mp3",    "sounds/houji.mp3",    "sounds/hyoukin.mp3",    "sounds/kurione.mp3",    "sounds/o-rora2.mp3",    "sounds/omae.mp3",    "sounds/reibou.mp3",    "sounds/riasushiki.mp3",    "sounds/self.mp3",    "sounds/tenkousei.mp3",    "sounds/yakoubus.mp3",
+        "sounds/ashika.mp3", "sounds/hitsuji.mp3", "sounds/inoshishi.mp3", "sounds/inu.mp3", "sounds/kakkou.mp3", "sounds/karasu.mp3", "sounds/lion.mp3", "sounds/neko.mp3", "sounds/niwatori.mp3", "sounds/uribou.mp3", "sounds/yagi.mp3", "sounds/zou.mp3", "sounds/103.mp3",    "sounds/boragino-ru.mp3",    "sounds/gekidanshiki.mp3",    "sounds/hizuke.mp3",    "sounds/houji.mp3",    "sounds/hyoukin.mp3",    "sounds/kurione.mp3",    "sounds/o-rora2.mp3",    "sounds/omae.mp3",    "sounds/reibou.mp3",    "sounds/riasushiki.mp3",    "sounds/self.mp3",    "sounds/tenkousei.mp3",    "sounds/yakoubus.mp3"
     };
     
     charactor = {
@@ -40,23 +57,50 @@ void ofApp::setup(){
         "sounds/Drum_8.mp3", "sounds/Drum_5.mp3", "sounds/Drum_10.mp3", "sounds/Drum_2.mp3", "sounds/Drum_3.mp3", "sounds/Drum_4.mp3"
     };
     
+    soshinaSet = {
+        "sounds/boragino-ru.mp3",    "sounds/gekidanshiki.mp3",    "sounds/hizuke.mp3",
+        "sounds/hyoukin.mp3",    "sounds/kurione.mp3",    "sounds/o-rora2.mp3"
+    };
+    
+    pianoSet = {
+        "sounds/Piano_C.mp3", "sounds/Piano_D.mp3", "sounds/Piano_E.mp3", "sounds/Piano_G.mp3", "sounds/Piano_A.mp3", "Piano_C5.mp3"
+    };
+    
+    animalSet = {
+        "sounds/hitsuji.mp3", "sounds/inu.mp3", "sounds/karasu.mp3", "sounds/lion.mp3", "sounds/neko.mp3", "sounds/zou.mp3"
+    };
+    
+    charaSet = {
+        "sounds/game_healer-attack1.mp3", "sounds/game_swordman-attack1.mp3", "sounds/game_swordwoman-damage1.mp3", "sounds/game_wizard-damage1.mp3", "sounds/info-girl1_info-girl1-desu1.mp3", "sounds/line-girl1_line-girl1-gyaaa1.mp3"
+    };
+    
+    omoroSet = {
+        "sounds/nyu1.mp3",    "sounds/nyu2.mp3",    "sounds/nyu3.mp3",    "sounds/people_people-shout-oo1.mp3",    "sounds/puyon1.mp3", "sounds/touch1.mp3"
+    };
+    
     for (int i = 0; i < 6; i++) {
         ofSoundPlayer sound;
         sound.load(drumSet[i]);
         sound.setVolume(0.2);
         sound.setMultiPlay(true);
         sounds2.push_back(sound);
-        toPiano.push_back(0);
     }
+    
+    
+    melody1 = {
+        1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    };
     
 	leap.open(); //リープ使います宣言
     leap.setupGestures();
     
     // keep app receiving data from leap motion even when it's in the background
     leap.setReceiveBackgroundFrames(true);
-    
-//    cam.setPosition(ofVec3f(50, 0, 0));
-//    cam.lookAt(ofVec3f(20, 0, 0), ofVec3f(0, 1, 0));
     
     cam.setOrientation(ofVec3f(-20,0,0));
     
@@ -68,18 +112,9 @@ void ofApp::setup(){
     
 //    world.enableDebugDraw(); //輪郭というか辺
     world.setCamera(&cam);
-    world.setGravity( ofVec3f(0, -9.8, 0) ); //重力セット
+    world.setGravity( ofVec3f(0, -9.8, 0) );
     
-    sphere = new ofxBulletSphere();
-    sphere->create(world.world, ofVec3f(0, 100, -100), 0.1, 5);
-    sphere->add();
-    
-//    cylinder = new ofxBulletCylinder();
-//    cylinder->create(world.world, ofVec3f(0, 100, 100), 0.1, 5, 200);
-//    cylinder->setDamping(1, 1);
-//    cylinder->add();
-    
-    ground.create( world.world, ofVec3f(0., -600, 0.), 0., 2000.f, 1.f, 2000.f );
+    ground.create( world.world, ofVec3f(0., -550, 0.), 0., 2000.f, 1.f, 2000.f );
     ground.setProperties(.25, .95);
     ground.add();
     
@@ -103,15 +138,14 @@ void ofApp::setup(){
     double curve = 1.4;
     
     sphereShape = ofBtGetSphereCollisionShape(20);
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 120; i++) {
         handSpheres.push_back( new ofxBulletSphere() );
         ii = handSpheres.size()-1;
         ((ofxBulletSphere*)handSpheres[ii])->init(sphereShape);
         // no need to pass radius, since we already created it in the sphereShape //
-        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), ofRandom(-580, -550), ofRandom(-400, -300)), 0.1);
+        ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), ofRandom(-490, -480), ofRandom(-200, -100)), 0.1);
         handSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         handSpheres[ii]->add();
-        handHits.push_back( false );
     }
     
     sphereShape = ofBtGetSphereCollisionShape(40);
@@ -201,7 +235,7 @@ void ofApp::setup(){
         } else if (i >= 3 && i < 7) {
             ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 4) - 100, 300, -100), 0.1);
         } else if (i >= 7 && i < 16) {
-            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(120.0*(i % 3) + 100 + pagePosition, 300 - (100*row), 0), 0.1);
+            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(120.0*((i - 1) % 3) + 100 + pagePosition, 900 - (100*row), 0), 0.1);
             if (i % 3 == 0) row += 1;
             if (row == 1) row += 1;
         }
@@ -228,27 +262,41 @@ void ofApp::update(){
         if (toBeat[i] > 0) toBeat[i] -= 1;
     }
     
-    if (toSwipe > 0) toSwipe -= 1;
-    switch (leap.iGestures) {
-        case 4:
-            if (page < 2 && toSwipe == 0) {
-                page += 1;
-                toSwipe = 20;
-            }
-            break;
-        case 3:
-            if (page > 0 && toSwipe == 0) {
-                page -= 1;
-                toSwipe = 20;
-            }
-            break;
-//        case 10:
-//            OF_EXIT_APP(0);
-//            break;
-            
-        default:
-            break;
+    if (toSwipe > 0){
+        toSwipe -= 1;
+    } else if (toSwipe == 0 && leap.iGestures){
+        switch (leap.iGestures) {
+            case 4:
+                if (page < 2) {
+                    page += 1;
+                    toSwipe = 20;
+                }
+                break;
+            case 3:
+                if (page > 0) {
+                    page -= 1;
+                    toSwipe = 20;
+                }
+                break;
+            case 10:
+                //            OF_EXIT_APP(0);
+                if (tempo > 7) {
+                    tempo -= 1;
+                    toSwipe = 20;
+                }
+                break;
+            case 9:
+                if (tempo < 16) {
+                    tempo += 1;
+                    toSwipe = 20;
+                }
+                break;
+                
+            default:
+                break;
+        }
     }
+    
     
     pagePosition = -(page-1) * pageSpace;
     ofPoint centerPos = ofPoint(0, -150, 150);
@@ -324,7 +372,7 @@ void ofApp::update(){
             diff = ofVec3f(200.0*(i - 4) - 100 + pagePosition, 300, -100) - buttonSpheres[i]->getPosition();
         } else if (i >= 7 && i < 16){
             pagePosition = -(page) * pageSpace;
-            diff = ofVec3f(120.0*(i % 3) + 100 + pagePosition, 300 - (100*row), 0) - buttonSpheres[i]->getPosition();
+            diff = ofVec3f(120.0*((i - 1) % 3) + 100 + pagePosition, 900 - (100*row) - menuSpace, 0) - buttonSpheres[i]->getPosition();
             if (i % 3 == 0) row += 1;
             if (row == 1) row += 1;
         }
@@ -344,6 +392,22 @@ void ofApp::update(){
         fingerType fingerTypes[] = {THUMB, INDEX, MIDDLE, RING, PINKY};
         
         for(int i = 0; i < simpleHands.size(); i++){  //手の数繰り返し
+            if (simpleHands[i].isLeft) {
+                if (simpleHands[i].handNormal.y > 0) {
+                    menu = true;
+                    menuSpace = 600;
+                }else{
+                    menu = false;
+                    menuSpace = 0;
+                }
+            } else {
+                if (simpleHands[i].handNormal.y > 0) {
+                    tutorial = true;
+                }else{
+                    tutorial = false;
+                }
+            }
+            
             for (int f=0; f<5; f++) { //指の数繰り返し
                 
                 int id = simpleHands[i].fingers[ fingerTypes[f] ].id;
@@ -403,18 +467,13 @@ void ofApp::update(){
             
         }
         toPlayTime += 1;
-        if (toPlayTime == 10) {
+        if (toPlayTime >= tempo) {
             toPlayTime = 0;
             column += 1;
         }
         if (column == 16) {
             column = 0;
         }
-    }
-    
-    
-    for (int i = 0; i < handSpheres.size(); i++) {
-        handHits[i] = false;
     }
     
     for (int i = 0; i < shapes.size(); i++) {
@@ -433,10 +492,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofBackgroundGradient(ofColor(200,200,200), ofColor(100, 200, 0),  OF_GRADIENT_BAR);
-	
-	ofSetColor(200);
-	ofDrawBitmapString("ofxLeapMotion - Example App\nLeap Connected? " + ofToString(leap.isConnected()), 20, 20);
+    ofBackgroundGradient(ofColor(200,200,200), ofColor(50, 100, 100),  OF_GRADIENT_BAR);
     
     glEnable( GL_DEPTH_TEST ); //隠面消去
 	cam.begin();
@@ -449,13 +505,7 @@ void ofApp::draw(){
     light.enable();
     
     ofSetColor(0, 100, 100, 50);
-//    if (leap.iGestures == 10) {
-//        ofSetColor(255, 100, 100);
-//    }
     ground.draw();
-    
-    ofSetColor(0,255,0);
-    sphere->draw();
     
     for(int i = 0; i < shapes.size(); i++) {
         ofSetColor(255,100,toPiano[i]*10 + 155);
@@ -517,7 +567,21 @@ void ofApp::draw(){
                 if (i - 3 == keySet) {
                     ofSetColor(20, 80, 100);
                 } else {
-                    ofSetColor(240);
+                    ofSetColor(150, 200, 150);
+                }
+                break;
+            case 7:case 8:case 9:
+                if (i - 7 == melodySet) {
+                    ofSetColor(200 - (toButton[i] * 3), 200 - (toButton[i] * 3), 100 - (toButton[i] * 3));
+                } else {
+                    ofSetColor(200, 200, 100);
+                }
+                break;
+            case 10:case 11:case 12:case 13:case 14:case 15:
+                if (i - 10 == keySet2) {
+                    ofSetColor(20, 80, 100);
+                } else {
+                    ofSetColor(150, 200, 150);
                 }
                 break;
                 
@@ -565,12 +629,7 @@ void ofApp::draw(){
     ofPoint centerPos = ofPoint(0, 300, 150);
     double r = 500;
     double curve = 1.3;
-    double angle = (double(column) + (toPlayTime/10.0))/ 4.8;
-    
-//    cylinder->draw();
-//    ofVec3f diff = ofVec3f(centerPos.x -r*cos(angle) + pagePosition, centerPos.y - 200, centerPos.z -r/curve*sin(angle)) - cylinder->getPosition();
-//    diff *= 40;
-//    cylinder->applyCentralForce(diff);
+    double angle = (double(column) + (toPlayTime/double(tempo)))/ 4.8;
     ofSetColor(0);
     ofSetLineWidth(20);
     ofDrawLine(centerPos.x -r*cos(angle) + pagePosition, centerPos.y, centerPos.z -r/curve*sin(angle), centerPos.x -r*cos(angle) + pagePosition, centerPos.y -600, centerPos.z -r/curve*sin(angle));
@@ -578,31 +637,58 @@ void ofApp::draw(){
     light.disable();
     ofDisableLighting();
 	cam.end();
+    
+    ofSetColor(255, 255, 255);
+//    stringstream ss;
+//    ss << "framerate: " << ofToString(ofGetFrameRate(),0) << endl;
+//    ss << "add spherers (s)" << endl;
+//    ss << "add boxes (b)" << endl;
+//    ofDrawBitmapString(ss.str().c_str(), 10, 10);
+    
+    if (tutorial) {
+        
+    }
+    
+    string connect;
+    if (leap.isConnected()) {
+        connect = "○";
+    } else {
+        connect = "×";
+    }
+    
+    int bpm = 3600 / (tempo * 4);
+    font1.drawString("おてて演奏器\nLeap Motion 接続　" + connect + "\nBPM: " + ofToString(bpm), 20, 30);
+    font2.drawString("スワイプでページ移動", 520, 300);
+    font2.drawString("始点へ", 480, 820);
+    font2.drawString("再生\n停止", 700, 730);
+    
+    ofSetColor(200, 200, 200, 50);
+    switch (page) {
+        case 0:
+            ofDrawTriangle(ofGetWindowWidth() - 60, ofGetWindowHeight() - 60, ofGetWindowWidth() - 60, ofGetWindowHeight() - 30, ofGetWindowWidth() - 30, ofGetWindowHeight() - 45);
+            break;
+        case 1:
+            ofDrawTriangle(ofGetWindowWidth() - 60, ofGetWindowHeight() - 60, ofGetWindowWidth() - 60, ofGetWindowHeight() - 30, ofGetWindowWidth() - 30, ofGetWindowHeight() - 45);
+            ofDrawTriangle(60, ofGetWindowHeight() - 60, 60, ofGetWindowHeight() - 30, 30, ofGetWindowHeight() - 45);
+            break;
+        case 2:
+            ofDrawTriangle(60, ofGetWindowHeight() - 60, 60, ofGetWindowHeight() - 30, 30, ofGetWindowHeight() - 45);
+            break;
+            
+        default:
+            break;
+    }
+//    ofDrawBitmapString("ofxLeapMotion - Example App\nLeap Connected? " + ofToString(leap.isConnected()), 20, 20);
 }
 
 //--------------------------------------------------------------
 void ofApp::onCollision(ofxBulletCollisionData& cdata) {
-//    for(int j = 0; j < handSpheres.size(); j++) {//壁との衝突は無視
-//        if(*handSpheres[j] == cdata) {
-//            return;
-//        }
-//    }
     
     for (int i = 0; i < shapes.size(); i++) {
         if(*shapes[i] == cdata && toPiano[i] == 0) {
             sphereHits[i] = true;
-            //        for (int j = 0; j < sphereHits.size(); j++) {
-            //            if (sphereHits[j] == true && toSound[j] == 0) {
-                            sounds[i].play();
-                            toPiano[i] = 20;
-            //            }
-            //        }
-        }
-    }
-    
-    for (int i = 0; i < handSpheres.size(); i++) {
-        if(*handSpheres[i] == cdata) {
-            handHits[i] = true;
+                sounds[i].play();
+                toPiano[i] = 20;
         }
     }
     
@@ -673,9 +759,77 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
                     break;
                 case 7:case 8:case 9:
                     melodySet = i - 7;
+                    bOn = melody1;
                     break;
                 case 10:case 11:case 12: case 13:case 14:case 15:
-                    keySet2 = i - 10;
+                    if (keySet2 != i - 10) {
+                        keySet2 = i - 10;
+                        switch (keySet2) {
+                            case 0:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(drumSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                            case 1:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(soshinaSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                            case 2:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(pianoSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                            case 3:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(animalSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                            case 4:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(charaSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                            case 5:
+                                sounds2.clear();
+                                for (int j = 0; j < 6; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(omoroSet[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds2.push_back(sound);
+                                }
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                    }
                     break;
                     
                 default:
@@ -706,6 +860,13 @@ void ofApp::keyPressed(int key){
             if (page > 0) {
                 page -= 1;
             }
+            break;
+        case OF_KEY_DOWN:
+            menu = true;
+            menuSpace = 600;
+        case OF_KEY_UP:
+            menu = false;
+            menuSpace = 0;
             
         default:
             break;
