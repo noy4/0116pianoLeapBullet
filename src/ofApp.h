@@ -33,11 +33,25 @@ public:
     
     ofSoundPlayer           mySound;
     vector <ofSoundPlayer>  sounds;
+    vector <ofSoundPlayer>  sounds2;
+    vector <string>         tekkinPiano;
+    vector <string>         animalSoshina;
+    vector <string>         charactor;
+    vector <string>         drum;
+    vector <string> drumSet;
+    vector <string> soshina;
+    vector <string> pianoSet;
+    vector <string> animalSet;
+    vector <string> charaSet;
+    vector <string> omoroSet;
     vector <int>            toPiano;
     int                     toPlayTime;
     int                     column;
     vector <int>            toBeat;
     vector <int>            toButton;
+    int     keySet;
+    int     keySet2;
+    int     melodySet;
     
     ofxBulletWorldRigid             world;
     ofxBulletBox                    ground;
@@ -49,7 +63,6 @@ public:
     ofxBulletCylinder*              cylinder;
     
     btBoxShape*                     boxShape;
-    btSphereShape*                  handSphere;
     btSphereShape*                  sphereShape;
     vector<ofxBulletRigidBody*>     shapes;
     vector<ofxBulletRigidBody*>     handSpheres;

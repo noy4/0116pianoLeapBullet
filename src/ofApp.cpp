@@ -14,12 +14,40 @@ void ofApp::setup(){
     bPlay = false;
     toPlayTime = 0;
     column = 0;
+    keySet = 0;
+    keySet2 = 0;
+    melodySet = 0;
     
-    string tekkin[] = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
+    tekkinPiano = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
         "sounds/tekkinD#.mp3", "sounds/tekkinE.mp3", "sounds/tekkinF.mp3", "sounds/tekkinF#.mp3",
         "sounds/tekkinG.mp3", "sounds/tekkinG#.mp3", "sounds/tekkinA.mp3", "sounds/tekkinA#.mp3",
-        "sounds/tekkinB.mp3", "sounds/tekkinC2.mp3"
+        "sounds/tekkinB.mp3", "sounds/Piano_C.mp3",    "sounds/Piano_C#.mp3",    "sounds/Piano_D.mp3",    "sounds/Piano_D#.mp3",    "sounds/Piano_E.mp3",    "sounds/Piano_F.mp3",    "sounds/Piano_F#.mp3",    "sounds/Piano_G.mp3",    "sounds/Piano_G#.mp3",    "sounds/Piano_A.mp3",    "sounds/Piano_A#.mp3",    "sounds/Piano_B.mp3",
     };
+    
+    animalSoshina = {
+        "sounds/ashika.mp3", "sounds/hitsuji.mp3", "sounds/inoshishi.mp3", "sounds/inu.mp3", "sounds/kakkou.mp3", "sounds/karasu.mp3", "sounds/lion.mp3", "sounds/neko.mp3", "sounds/niwatori.mp3", "sounds/uribou.mp3", "sounds/yagi.mp3", "sounds/zou.mp3", "sounds/103.mp3",    "sounds/boragino-ru.mp3",    "sounds/gekidanshiki.mp3",    "sounds/hizuke.mp3",    "sounds/houji.mp3",    "sounds/hyoukin.mp3",    "sounds/kurione.mp3",    "sounds/o-rora2.mp3",    "sounds/omae.mp3",    "sounds/reibou.mp3",    "sounds/riasushiki.mp3",    "sounds/self.mp3",    "sounds/tenkousei.mp3",    "sounds/yakoubus.mp3",
+    };
+    
+    charactor = {
+        "sounds/game_healer-attack1.mp3",    "sounds/game_healer-attack2.mp3",    "sounds/game_healer-damage1.mp3",    "sounds/game_swordman-attack1.mp3",    "sounds/game_swordman-attack3.mp3",    "sounds/game_swordwoman-attack1.mp3",    "sounds/game_swordwoman-damage1.mp3",    "sounds/game_wizard-damage1.mp3",     "sounds/info-girl1_info-girl1-ashita1.mp3",    "sounds/info-girl1_info-girl1-asu1.mp3",    "sounds/info-girl1_info-girl1-dayo1.mp3",    "sounds/info-girl1_info-girl1-deshita1.mp3",    "sounds/info-girl1_info-girl1-desu1.mp3",    "sounds/info-girl1_info-girl1-excellent1.mp3",    "sounds/info-girl1_info-girl1-ganbarimasyou1.mp3",    "sounds/info-girl1_info-girl1-kinou1.mp3",    "sounds/info-girl1_info-girl1-mamonaku1.mp3",    "sounds/info-girl1_info-girl1-omedetougozaimasu1.mp3",    "sounds/info-girl1_info-girl1-oyoso1.mp3",    "sounds/info-girl1_info-girl1-tadaima1.mp3",    "sounds/info-girl1_info-girl1-yaku1.mp3",    "sounds/info-girl1_info-girl1-zyunbihaiikana1.mp3",    "sounds/line-girl1_line-girl1-gyaaa1.mp3",    "sounds/people_people-shout-oo2.mp3"
+    };
+    
+    drum = {
+        "sounds/Drum_1.mp3",    "sounds/Drum_2.mp3",    "sounds/Drum_3.mp3",    "sounds/Drum_4.mp3",    "sounds/Drum_5.mp3",    "sounds/Drum_6.mp3",    "sounds/Drum_7.mp3",    "sounds/Drum_8.mp3",    "sounds/Drum_9.mp3",    "sounds/Drum_10.mp3", "sounds/nyu1.mp3",    "sounds/nyu2.mp3",    "sounds/nyu3.mp3",    "sounds/people_people-shout-oo1.mp3",    "sounds/puyon1.mp3",    "sounds/strike1.mp3",    "sounds/touch1.mp3",    "sounds/zombie-death-throes1.mp3", "sounds/boragino-ru.mp3",    "sounds/gekidanshiki.mp3",    "sounds/hizuke.mp3",    "sounds/houji.mp3",    "sounds/hyoukin.mp3",    "sounds/kurione.mp3"
+    };
+    
+    drumSet = {
+        "sounds/Drum_8.mp3", "sounds/Drum_5.mp3", "sounds/Drum_10.mp3", "sounds/Drum_2.mp3", "sounds/Drum_3.mp3", "sounds/Drum_4.mp3"
+    };
+    
+    for (int i = 0; i < 6; i++) {
+        ofSoundPlayer sound;
+        sound.load(drumSet[i]);
+        sound.setVolume(0.2);
+        sound.setMultiPlay(true);
+        sounds2.push_back(sound);
+        toPiano.push_back(0);
+    }
     
 	leap.open(); //リープ使います宣言
     leap.setupGestures();
@@ -74,11 +102,11 @@ void ofApp::setup(){
     double angleSpace = 4.2;
     double curve = 1.4;
     
-    handSphere = ofBtGetSphereCollisionShape(20);
+    sphereShape = ofBtGetSphereCollisionShape(20);
     for (int i = 0; i < 40; i++) {
         handSpheres.push_back( new ofxBulletSphere() );
         ii = handSpheres.size()-1;
-        ((ofxBulletSphere*)handSpheres[ii])->init(handSphere);
+        ((ofxBulletSphere*)handSpheres[ii])->init(sphereShape);
         // no need to pass radius, since we already created it in the sphereShape //
         ((ofxBulletSphere*)handSpheres[ii])->create(world.world, ofVec3f(ofRandom(-100, 100), ofRandom(-580, -550), ofRandom(-400, -300)), 0.1);
         handSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
@@ -87,9 +115,9 @@ void ofApp::setup(){
     }
     
     sphereShape = ofBtGetSphereCollisionShape(40);
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 24; i++) {
         ofSoundPlayer sound;
-        sound.load(tekkin[i]);
+        sound.load(tekkinPiano[i]);
         sound.setVolume(0.2);
         sound.setMultiPlay(true);
         sounds.push_back(sound);
@@ -163,11 +191,20 @@ void ofApp::setup(){
     }
     
     sphereShape = ofBtGetSphereCollisionShape(40);
-    for (int i = 0; i < 3; i++) {
+    int row = 0;
+    for (int i = 0; i < 16; i++) {
         buttonSpheres.push_back( new ofxBulletSphere() );
         ii = buttonSpheres.size()-1;
         ((ofxBulletSphere*)buttonSpheres[ii])->init(sphereShape);
-        ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 1) + pagePosition, -400, 0), 0.1);
+        if (i < 3) {
+            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 1) + pagePosition, -400, 0), 0.1);
+        } else if (i >= 3 && i < 7) {
+            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 4) - 100, 300, -100), 0.1);
+        } else if (i >= 7 && i < 16) {
+            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(120.0*(i % 3) + 100 + pagePosition, 300 - (100*row), 0), 0.1);
+            if (i % 3 == 0) row += 1;
+            if (row == 1) row += 1;
+        }
         buttonSpheres[ii]->setDamping(1, .8);
         buttonSpheres[ii]->setActivationState( DISABLE_DEACTIVATION );
         buttonSpheres[ii]->add();
@@ -278,8 +315,20 @@ void ofApp::update(){
         soundSpheres[i]->applyCentralForce(diff);
     }
     
+    int row = 0;
     for (int i = 0; i < buttonSpheres.size(); i++) {
-        diff = ofVec3f(200.0*(i - 1) + pagePosition, -400, 0) - buttonSpheres[i]->getPosition();
+        if (i < 3) {
+            diff = ofVec3f(200.0*(i - 1) + pagePosition, -400, 0) - buttonSpheres[i]->getPosition();
+        } else if (i >= 3 && i < 7){
+            pagePosition = -(page-1) * pageSpace;
+            diff = ofVec3f(200.0*(i - 4) - 100 + pagePosition, 300, -100) - buttonSpheres[i]->getPosition();
+        } else if (i >= 7 && i < 16){
+            pagePosition = -(page) * pageSpace;
+            diff = ofVec3f(120.0*(i % 3) + 100 + pagePosition, 300 - (100*row), 0) - buttonSpheres[i]->getPosition();
+            if (i % 3 == 0) row += 1;
+            if (row == 1) row += 1;
+        }
+        
         diff *= 40;
         buttonSpheres[i]->applyCentralForce(diff);
     }
@@ -346,10 +395,9 @@ void ofApp::update(){
     
     if (bPlay) {
         if(toPlayTime == 0){
-//            sounds[0].play();
             for (int i = 0; i < 6; i++) {
                 if (bOn[column + (16*i)]) {
-                    sounds[i].play();
+                    sounds2[i].play();
                 }
             }
             
@@ -465,6 +513,13 @@ void ofApp::draw(){
             case 2:
                 ofSetColor(200, toButton[i]*8, toButton[i]*8);
                 break;
+            case 3:case 4:case 5:case 6:
+                if (i - 3 == keySet) {
+                    ofSetColor(20, 80, 100);
+                } else {
+                    ofSetColor(240);
+                }
+                break;
                 
             default:
                 break;
@@ -539,7 +594,7 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
             //        for (int j = 0; j < sphereHits.size(); j++) {
             //            if (sphereHits[j] == true && toSound[j] == 0) {
                             sounds[i].play();
-                            toPiano[i] = 10;
+                            toPiano[i] = 20;
             //            }
             //        }
         }
@@ -565,6 +620,62 @@ void ofApp::onCollision(ofxBulletCollisionData& cdata) {
                     for (int j = 0; j < soundSpheres.size(); j++) {
                         bOn[j] = false;
                     }
+                    break;
+                case 3:case 4:case 5: case 6:
+                    if (keySet != i - 3){
+                        keySet = i - 3;
+                        switch (keySet) {
+                            case 0:
+                                sounds.clear();
+                                for (int j = 0; j < 24; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(tekkinPiano[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds.push_back(sound);
+                                }
+                                break;
+                            case 1:
+                                sounds.clear();
+                                for (int j = 0; j < 24; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(animalSoshina[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds.push_back(sound);
+                                }
+                                break;
+                            case 2:
+                                sounds.clear();
+                                for (int j = 0; j < 24; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(charactor[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds.push_back(sound);
+                                }
+                                break;
+                            case 3:
+                                sounds.clear();
+                                for (int j = 0; j < 24; j++) {
+                                    ofSoundPlayer sound;
+                                    sound.load(drum[j]);
+                                    sound.setVolume(0.2);
+                                    sound.setMultiPlay(true);
+                                    sounds.push_back(sound);
+                                }
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case 7:case 8:case 9:
+                    melodySet = i - 7;
+                    break;
+                case 10:case 11:case 12: case 13:case 14:case 15:
+                    keySet2 = i - 10;
                     break;
                     
                 default:
