@@ -76,9 +76,9 @@ public:
     double      pagePosition;
     int         toSwipe;
     
-    bool menu;
-    double menuSpace;
-    bool tutorial;
+    bool    menu;
+    double  menuSpace;
+    bool    tutorial;
     
     ofTrueTypeFont font1;
     ofTrueTypeFont font2;
