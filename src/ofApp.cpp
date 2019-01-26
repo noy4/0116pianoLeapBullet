@@ -27,13 +27,14 @@ void ofApp::setup(){
     settings.addRanges(ofAlphabet::Japanese);//日本語
     settings.addRange(ofUnicode::Latin);//アルファベット等
     font1.load(settings);
+    font1.setLineHeight(30);
     
     ofTrueTypeFontSettings settings2("goPr.otf", 30);
     settings.addRanges(ofAlphabet::Emoji);//絵文字
     settings2.addRanges(ofAlphabet::Japanese);
     settings.addRange(ofUnicode::Latin);//アルファベット等
     font2.load(settings2);
-    font2.setLineHeight(30);
+    font2.setLineHeight(50);
     
     tekkinPiano = {"sounds/tekkinC.mp3", "sounds/tekkinC#.mp3", "sounds/tekkinD.mp3",
         "sounds/tekkinD#.mp3", "sounds/tekkinE.mp3", "sounds/tekkinF.mp3", "sounds/tekkinF#.mp3",
@@ -639,14 +640,26 @@ void ofApp::draw(){
 	cam.end();
     
     ofSetColor(255, 255, 255);
-//    stringstream ss;
-//    ss << "framerate: " << ofToString(ofGetFrameRate(),0) << endl;
-//    ss << "add spherers (s)" << endl;
-//    ss << "add boxes (b)" << endl;
-//    ofDrawBitmapString(ss.str().c_str(), 10, 10);
     
     if (tutorial) {
-        
+        switch (page) {
+            case 0:
+                if (menu) {
+                    font2.drawString("リズム例", 900, 150);
+                    font2.drawString("音変更", 900, 400);
+                } else {
+                    font2.drawString("円を描いてテンポ変更", 520, 100);
+                    font2.drawString("始点へ", 490, 830);
+                    font2.drawString("再生\n停止", 680, 800);
+                    font2.drawString("リセット", 820, 830);
+                }
+                break;
+            case 1:
+                font2.drawString("スワイプでページ移動", 520, 300);
+                
+            default:
+                break;
+        }
     }
     
     string connect;
@@ -657,10 +670,7 @@ void ofApp::draw(){
     }
     
     int bpm = 3600 / (tempo * 4);
-    font1.drawString("おてて演奏器\nLeap Motion 接続　" + connect + "\nBPM: " + ofToString(bpm), 20, 30);
-    font2.drawString("スワイプでページ移動", 520, 300);
-    font2.drawString("始点へ", 480, 820);
-    font2.drawString("再生\n停止", 700, 730);
+    font1.drawString("おてて演奏器\nLeap Motion 接続：　" + connect + "\nBPM： " + ofToString(bpm), 20, 30);
     
     ofSetColor(200, 200, 200, 50);
     switch (page) {
@@ -678,7 +688,6 @@ void ofApp::draw(){
         default:
             break;
     }
-//    ofDrawBitmapString("ofxLeapMotion - Example App\nLeap Connected? " + ofToString(leap.isConnected()), 20, 20);
 }
 
 //--------------------------------------------------------------
