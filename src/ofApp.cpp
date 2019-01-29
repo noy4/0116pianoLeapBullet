@@ -250,7 +250,7 @@ void ofApp::setup(){
         ii = buttonSpheres.size()-1;
         ((ofxBulletSphere*)buttonSpheres[ii])->init(sphereShape);
         if (i < 3) {
-            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 1) + pagePosition, -400, 0), 0.1);
+            ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(400.0*(i - 1) + pagePosition, -400, 0), 0.1);
         } else if (i >= 3 && i < 7) {
             ((ofxBulletSphere*)buttonSpheres[ii])->create(world.world, ofVec3f(200.0*(i - 4) - 100, 300, -100), 0.1);
         } else if (i >= 7 && i < 16) {
@@ -399,7 +399,7 @@ void ofApp::update(){
     int row = 0;
     for (int i = 0; i < buttonSpheres.size(); i++) {
         if (i < 3) {
-            diff = ofVec3f(200.0*(i - 1) + pagePosition, -400, 0) - buttonSpheres[i]->getPosition();
+            diff = ofVec3f(400.0*(i - 1) + pagePosition, -400, 0) - buttonSpheres[i]->getPosition();
         } else if (i >= 3 && i < 7){
             pagePosition = -(page-1) * pageSpace;
             diff = ofVec3f(200.0*(i - 4) - 100 + pagePosition, 300, -100) - buttonSpheres[i]->getPosition();
@@ -664,9 +664,9 @@ void ofApp::draw(){
                     font2.drawString("音変更", 900, 400);
                 } else {
                     font2.drawString("円を描いてテンポ変更", 520, 100);
-                    font2.drawString("始点へ", 490, 830);
+                    font2.drawString("始点へ", 300, 830);
                     font2.drawString("再生\n停止", 680, 800);
-                    font2.drawString("リセット", 820, 830);
+                    font2.drawString("リセット", 1000, 830);
                 }
                 break;
             case 1:
